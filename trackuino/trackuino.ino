@@ -52,11 +52,19 @@
 #  include <WProgram.h>
 #endif
 
+// include the library code:
+#include <LiquidCrystal.h>
+
 // Module constants
 static const uint32_t VALID_POS_TIMEOUT = 2000;  // ms
 
 // Module variables
 static int32_t next_aprs = 0;
+
+// initialize the library with the numbers of the interface pins
+#ifdef LCD_ENABLED
+LiquidCrystal lcd(LCD_PINS);
+#endif
 
 
 void setup()
@@ -107,6 +115,15 @@ void setup()
 #endif
   // TODO: beep while we get a fix, maybe indicating the number of
   // visible satellites by a series of short beeps?
+  
+#ifdef LCD_ENABLED
+  // set up the LCD's number of columns and rows: 
+  lcd.begin(16, 2);
+  // Print a message to the LCD.
+  lcd.print(S_CALLSIGN);
+  lcd.print("-");
+  lcd.print(S_CALLSIGN_ID);
+#endif
 }
 
 void get_pos()
@@ -136,6 +153,15 @@ void loop()
   if ((int32_t) (millis() - next_aprs) >= 0) {
 #ifndef GPS_DISABLED
     get_pos();
+#endif
+#ifdef LCD_ENABLED
+    lcd.setCursor(0, 1);
+    lcd.print("Ti=");
+    lcd.print(sensors_int_lm60());
+    lcd.print(", Te=");
+    lcd.print(sensors_ext_lm60());
+    lcd.print(", Vin=");
+    lcd.print(sensors_vin());
 #endif
     aprs_send();
     next_aprs += APRS_PERIOD * 1000L;
