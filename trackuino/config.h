@@ -53,6 +53,10 @@
 #define DIGI_PATH1      "WIDE2"
 #define DIGI_PATH1_TTL  1
 
+// Symbol table and code: '/' for primary table, code 'O' for balloon, '-' for QTH.
+#define SYMBOL_TABLE    '/'
+#define SYMBOL_CODE     '-'
+
 // APRS comment: this goes in the comment portion of the APRS message. You
 // might want to keep this short. The longer the packet, the more vulnerable
 // it is to noise. 
@@ -88,6 +92,13 @@
 // GPS baud rate (in bits per second). This is also the baud rate at which
 // debug data will be printed out the serial port.
 #define GPS_BAUDRATE  9600
+
+// Disable GPS and just use a predefined latitude and longitude.
+// Make sure to use the correct format. You may also define an altitude (in meters).
+//#define GPS_DISABLED
+//#define LATITUDE "3802.75N"
+//#define LONGITUDE "02340.90E"
+//#define ALTITUDE 0
 
 
 // --------------------------------------------------------------------------
