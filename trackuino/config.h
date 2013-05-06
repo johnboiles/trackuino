@@ -149,6 +149,8 @@
 // Read more in the Arduino reference docs:
 // http://arduino.cc/en/Reference/AnalogReference?from=Reference.AREF
 
+#define EXTERNAL_LM60_DISABLED
+
 // Pin mappings for the internal / external temperature sensors. VS refers
 // to (arduino) digital pins, whereas VOUT refers to (arduino) analog pins.
 #define INTERNAL_LM60_VS_PIN     6
