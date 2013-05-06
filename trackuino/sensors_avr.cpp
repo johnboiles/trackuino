@@ -26,7 +26,7 @@
 #include "config.h"
 #include "pin.h"
 #include "sensors_avr.h"
-#include <WProgram.h>
+#include <Arduino.h>
 
 /*
  * sensors_aref: measure an external voltage hooked up to the AREF pin,

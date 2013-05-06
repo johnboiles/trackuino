@@ -21,7 +21,7 @@
 #include "pin.h"
 #include <p32xxxx.h>
 #include <plib.h>
-#include <WProgram.h>
+#include <Arduino.h>
 
 // Module constants
 static const unsigned long PWM_PERIOD = F_CPU / 8 / BUZZER_FREQ;

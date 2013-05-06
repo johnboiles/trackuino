@@ -19,7 +19,7 @@
 #include "pin.h"
 #include <plib.h>
 #include <stdint.h>
-#include <WProgram.h>
+#include <Arduino.h>
 
 // This is a digitalWrite() replacement that does not disrupt
 // timer 2.

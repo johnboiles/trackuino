@@ -31,9 +31,9 @@
 #error "See trackuino.pde for details on this"
 
 // Arduino 1.0+ introduced backwards-incompatible changes in the serial lib.
-#elif (ARDUINO + 1) >= 100
-#error "Ooops! We don't support Arduino 1.0+ (yet). Please use 22 or 23"
-#error "See trackuino.pde for details on this"
+//#elif (ARDUINO + 1) >= 100
+//#error "Ooops! We don't support Arduino 1.0+ (yet). Please use 22 or 23"
+//#error "See trackuino.pde for details on this"
 
 #endif
 
@@ -52,7 +52,7 @@
 
 // Arduino/AVR libs
 #include <Wire.h>
-#include <WProgram.h>
+#include <Arduino.h>
 
 // Module constants
 static const uint32_t VALID_POS_TIMEOUT = 2000;  // ms

@@ -26,7 +26,7 @@
 #include "config.h"
 #include "pin.h"
 #include "sensors_pic32.h"
-#include <WProgram.h>
+#include <Arduino.h>
 
 void sensors_setup()
 {

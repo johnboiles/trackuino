@@ -17,7 +17,7 @@
 #ifdef PIC32MX
 
 #include <plib.h>
-#include <WProgram.h>
+#include <Arduino.h>
 #include "config.h"
 #include "pin.h"
 

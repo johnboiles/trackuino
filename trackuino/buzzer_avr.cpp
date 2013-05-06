@@ -19,7 +19,7 @@
 #include "config.h"
 #include "buzzer.h"
 #include "pin.h"
-#include <WProgram.h>
+#include <Arduino.h>
 #include <stdint.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>

@@ -33,7 +33,7 @@
 #include "afsk_pic32.h"
 #include "pin.h"
 #include "radio_hx1.h"
-#include <WProgram.h>
+#include <Arduino.h>
 #include <stdint.h>
 
 // Module consts

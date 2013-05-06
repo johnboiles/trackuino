@@ -18,7 +18,7 @@
 #include "config.h"
 #include "pin.h"
 #include "radio_hx1.h"
-#include <WProgram.h>
+#include <Arduino.h>
 
 
 void RadioHx1::setup()

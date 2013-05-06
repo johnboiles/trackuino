@@ -17,7 +17,7 @@
 
 #include "config.h"
 #include "gps.h"
-#include <WProgram.h>
+#include <Arduino.h>
 #include <stdlib.h>
 #include <string.h>
 

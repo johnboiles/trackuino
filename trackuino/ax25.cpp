@@ -20,7 +20,7 @@
 #include "afsk_avr.h"
 #include "afsk_pic32.h"
 #include <stdint.h>
-#include <WProgram.h>
+#include <Arduino.h>
 
 // Module constants
 static const unsigned int MAX_PACKET = 512;  // bytes

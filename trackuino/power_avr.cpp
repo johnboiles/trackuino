@@ -19,7 +19,7 @@
 #include <avr/power.h>
 #include <avr/signal.h>
 #include <avr/sleep.h>
-#include <WProgram.h>
+#include <Arduino.h>
 #include "config.h"
 #include "pin.h"
 #include "power.h"

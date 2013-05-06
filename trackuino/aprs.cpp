@@ -23,7 +23,7 @@
 #include "sensors_pic32.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <WProgram.h>
+#include <Arduino.h>
 
 // Module functions
 float meters_to_feet(float m)
