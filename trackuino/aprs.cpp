@@ -52,14 +52,15 @@ void aprs_send()
   };
 
   ax25_send_header(addresses, sizeof(addresses)/sizeof(s_address));
+#ifndef GPS_DISABLED
   ax25_send_byte('/');                // Report w/ timestamp, no APRS messaging. $ = NMEA raw data
   // ax25_send_string("021709z");     // 021709z = 2nd day of the month, 17:09 zulu (UTC/GMT)
   ax25_send_string(gps_time);         // 170915 = 17h:09m:15s zulu (not allowed in Status Reports)
   ax25_send_byte('h');
   ax25_send_string(gps_aprs_lat);     // Lat: 38deg and 22.20 min (.20 are NOT seconds, but 1/100th of minutes)
-  ax25_send_byte('/');                // Symbol table
+  ax25_send_byte(SYMBOL_TABLE);       // Symbol table
   ax25_send_string(gps_aprs_lon);     // Lon: 000deg and 25.80 min
-  ax25_send_byte('O');                // Symbol: O=balloon, -=QTH
+  ax25_send_byte(SYMBOL_CODE);        // Symbol: O=balloon, -=QTH
   snprintf(temp, 4, "%03d", (int)(gps_course + 0.5)); 
   ax25_send_string(temp);             // Course (degrees)
   ax25_send_byte('/');                // and
@@ -68,6 +69,18 @@ void aprs_send()
   ax25_send_string("/A=");            // Altitude (feet). Goes anywhere in the comment area
   snprintf(temp, 7, "%06ld", (long)(meters_to_feet(gps_altitude) + 0.5));
   ax25_send_string(temp);
+#else
+  ax25_send_byte('!');                // Report w/ timestamp, no APRS messaging. $ = NMEA raw data
+  ax25_send_string(LATITUDE);         // Lat: 38deg and 22.20 min (.20 are NOT seconds, but 1/100th of minutes)
+  ax25_send_byte(SYMBOL_TABLE);       // Symbol table
+  ax25_send_string(LONGITUDE);        // Lon: 000deg and 25.80 min
+  ax25_send_byte(SYMBOL_CODE);        // Symbol: O=balloon, -=QTH
+#ifdef ALTITUDE
+  ax25_send_string("/A=");            // Altitude (feet). Goes anywhere in the comment area
+  snprintf(temp, 7, "%06ld", (long)(meters_to_feet(ALTITUDE) + 0.5));
+  ax25_send_string(temp);
+#endif
+#endif
   ax25_send_string("/Ti=");
   snprintf(temp, 6, "%d", sensors_int_lm60());
   ax25_send_string(temp);

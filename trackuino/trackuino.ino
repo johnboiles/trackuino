@@ -69,9 +69,13 @@ void setup()
   Serial.println("RESET");
 #endif
 
+#ifndef GPS_DISABLED
   buzzer_setup();
+#endif
   afsk_setup();
+#ifndef GPS_DISABLED
   gps_setup();
+#endif
   sensors_setup();
 
 #ifdef DEBUG_SENS
@@ -83,6 +87,7 @@ void setup()
   Serial.println(sensors_vin());
 #endif
 
+#ifndef GPS_DISABLED
   // Do not start until we get a valid time reference
   // for slotted transmissions.
   if (APRS_SLOT >= 0) {
@@ -96,7 +101,10 @@ void setup()
   }
   else {
     next_aprs = millis();
-  }  
+  }
+#else
+  next_aprs = millis();
+#endif
   // TODO: beep while we get a fix, maybe indicating the number of
   // visible satellites by a series of short beeps?
 }
@@ -111,6 +119,7 @@ void get_pos()
       valid_pos = gps_decode(Serial.read());
   } while ( (millis() - timeout < VALID_POS_TIMEOUT) && ! valid_pos) ;
 
+#ifndef GPS_DISABLED
   if (valid_pos) {
     if (gps_altitude > BUZZER_ALTITUDE) {
       buzzer_off();   // In space, no one can hear you buzz
@@ -118,13 +127,16 @@ void get_pos()
       buzzer_on();
     }
   }
+#endif
 }
 
 void loop()
 {
   // Time for another APRS frame
   if ((int32_t) (millis() - next_aprs) >= 0) {
+#ifndef GPS_DISABLED
     get_pos();
+#endif
     aprs_send();
     next_aprs += APRS_PERIOD * 1000L;
     while (afsk_flush()) {
