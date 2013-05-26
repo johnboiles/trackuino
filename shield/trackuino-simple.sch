@@ -16815,7 +16815,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="LM2" library="SparkFun" deviceset="M03" device="PTH"/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="R3" library="rcl" deviceset="R-EU_" device="0207/10" value="8K2"/>
-<part name="C1" library="resistor" deviceset="C-EU" device="050-025X075" value="100nF"/>
+<part name="C1" library="resistor" deviceset="C-EU" device="050-025X075" value="10nF"/>
 <part name="C2" library="resistor" deviceset="CPOL-EU" device="E2.5-6" value="10uF"/>
 <part name="T2" library="transistor" deviceset="BC547" device=""/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="0207/10" value="10K"/>
