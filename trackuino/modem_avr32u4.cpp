@@ -14,14 +14,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#if defined(AVR) && !defined(__AVR_ATmega32U4__)
+#if defined(__AVR_ATmega32U4__)
 
-#include "afsk_avr.h"
+#include "afsk_avr32u4.h"
 #include <avr/interrupt.h>
 
 // This is the timer 2 interrupt service routine (ISR). Multiple
 // modems can be operated from here.
-ISR(TIMER2_OVF_vect)
+ISR(TIMER1_OVF_vect)
 {
   // Call modem ISRs:
   afsk_isr();

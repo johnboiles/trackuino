@@ -109,7 +109,7 @@
 // PWM, so the only two options are pins 3 and 11.
 // Pin 11 doubles as MOSI, so I suggest using pin 3 for PWM and leave 11 free
 // in case you ever want to interface with an SPI device.
-#define AUDIO_PIN       3
+#define AUDIO_PIN       10
 
 // --------------------------------------------------------------------------
 // Radio config (radio_hx1.cpp)

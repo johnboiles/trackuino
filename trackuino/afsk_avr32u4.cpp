@@ -14,12 +14,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#if defined(AVR) && !defined(__AVR_ATmega32U4__)
+#if defined(__AVR_ATmega32U4__)
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include "config.h"
-#include "afsk_avr.h"
+#include "afsk_avr32u4.h"
 
 
 // Module consts
@@ -80,61 +80,56 @@ extern const uint32_t PLAYBACK_RATE    = MODEM_CLOCK_RATE / 256;  // Fast PWM
 
 void afsk_timer_setup()
 {
-  // Set up Timer 2 to do pulse width modulation on the speaker
-  // pin.
-  
-  // Source timer2 from clkIO (datasheet p.164)
-  ASSR &= ~(_BV(EXCLK) | _BV(AS2));
-  
-  // Set fast PWM mode with TOP = 0xff: WGM22:0 = 3  (p.150)
+  // Set up timer 1 (pins 9/OC1A or 10/OC1B) to do pulse width modulation on the speaker
+  // pin. Don't use Timer 0 because changing its prescaler value would mess with millis() and delay()
+  // See the pin configuration of the ATMega32U4 here: http://arduino.cc/en/Hacking/PinMapping32u4
+
+  // Source timer1 from clkIO with no prescale CS1[2:0] = 1 (datasheet p.133)
+  TCCR1B = (TCCR1B | _BV(CS10)) & ~(_BV(CS12) | _BV(CS11));
+
+  // Set fast PWM mode with TOP = 0xff: WGM1[3:0] = 5  (p.129)
   // This allows 256 cycles per sample and gives 16M/256 = 62.5 KHz PWM rate
-  
-  TCCR2A |= _BV(WGM21) | _BV(WGM20);
-  TCCR2B &= ~_BV(WGM22);
-  
-  // Phase correct PWM with top = 0xff: WGM22:0 = 1 (p.152 and p.160))
-  // This allows 510 cycles per sample and gives 16M/510 = ~31.4 KHz PWM rate
-  //TCCR2A = (TCCR2A | _BV(WGM20)) & ~_BV(WGM21);
-  //TCCR2B &= ~_BV(WGM22);
-  
-#if AUDIO_PIN == 11
-  // Do non-inverting PWM on pin OC2A (arduino pin 11) (p.159)
-  // OC2B (arduino pin 3) stays in normal port operation:
+  // NOTE(johnb): From datasheet: Update of OCRnx at TOP, TOVn Flag Set on TOP
+  TCCR1A = (TCCR1A | _BV(WGM10)) & ~_BV(WGM11);
+  TCCR1B = (TCCR1B | _BV(WGM12)) & ~_BV(WGM13);
+
+#if AUDIO_PIN == 9
+  // Do non-inverting PWM on pin OC1A (arduino pin 9) (p.130)
+  // OC1B (arduino pin 10) stays in normal port operation:
   // COM2A1=1, COM2A0=0, COM2B1=0, COM2B0=0
-  TCCR2A = (TCCR2A | _BV(COM2A1)) & ~(_BV(COM2A0) | _BV(COM2B1) | _BV(COM2B0));
+  // TODO(johnb): Also possible that mode 3 was correct here (COM1A1=1, COM1A0=1), I'm not sure.
+  // NOTE(johnb): From datasheet: Clear OCnA/OCnB/OCnC on compare match, set OCnA/OCnB/OCnC at TOP
+  TCCR1A = (TCCR1A | _BV(COM1A1)) & ~(_BV(COM1A0) | _BV(COM1B1) | _BV(COM1B0));
 #endif  
 
-#if AUDIO_PIN == 3
-  // Do non-inverting PWM on pin OC2B (arduino pin 3) (p.159).
-  // OC2A (arduino pin 11) stays in normal port operation: 
+#if AUDIO_PIN == 10
+  // Do non-inverting PWM on pin OC1B (arduino pin 10)
+  // OC1A (arduino pin 9) stays in normal port operation: 
   // COM2B1=1, COM2B0=0, COM2A1=0, COM2A0=0
-  TCCR2A = (TCCR2A | _BV(COM2B1)) & ~(_BV(COM2B0) | _BV(COM2A1) | _BV(COM2A0));
+  TCCR1A = (TCCR1A | _BV(COM1B1)) & ~(_BV(COM1B0) | _BV(COM1A1) | _BV(COM1A0));
 #endif
-  
-  // No prescaler (p.162)
-  TCCR2B = (TCCR2B & ~(_BV(CS22) | _BV(CS21))) | _BV(CS20);
 
   // Set initial pulse width to the rest position (0v after DC decoupling)
-  OCR2 = REST_DUTY;
+  OCR1 = REST_DUTY;
 }
 
 void afsk_timer_start()
 {
   // Clear the overflow flag, so that the interrupt doesn't go off
   // immediately and overrun the next one (p.163).
-  TIFR2 |= _BV(TOV2);       // Yeah, writing a 1 clears the flag.
+  TIFR1 |= _BV(TOV1);       // Yeah, writing a 1 clears the flag.
 
   // Enable interrupt when TCNT2 reaches TOP (0xFF) (p.151, 163)
-  TIMSK2 |= _BV(TOIE2);
+  TIMSK1 |= _BV(TOIE1);
 }
 
 void afsk_timer_stop()
 {
   // Output 0v (after DC coupling)
-  OCR2 = REST_DUTY;
+  OCR1 = REST_DUTY;
 
   // Disable playback interrupt
-  TIMSK2 &= ~_BV(TOIE2);
+  TIMSK1 &= ~_BV(TOIE1);
 }
 
 

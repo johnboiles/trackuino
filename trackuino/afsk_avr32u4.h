@@ -15,10 +15,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#if defined(AVR) && !defined(__AVR_ATmega32U4__)
+#if defined(__AVR_ATmega32U4__)
 
-#ifndef __AFSK_AVR_H__
-#define __AFSK_AVR_H__
+#ifndef __AFSK_AVR32U4_H__
+#define __AFSK_AVR32U4_H__
 
 #include <stdint.h>
 #include <avr/pgmspace.h>
@@ -34,11 +34,11 @@ extern const uint32_t PLAYBACK_RATE;
 extern const prog_uchar afsk_sine_table[];
 
 // Inline functions (this saves precious cycles in the ISR)
-#if AUDIO_PIN == 3
-#  define OCR2 OCR2B
+#if AUDIO_PIN == 9
+#  define OCR1 OCR1A
 #endif
-#if AUDIO_PIN == 11
-#  define OCR2 OCR2A
+#if AUDIO_PIN == 10
+#  define OCR1 OCR1B
 #endif
 
 inline uint8_t afsk_read_sample(int phase)
@@ -48,21 +48,21 @@ inline uint8_t afsk_read_sample(int phase)
 
 inline void afsk_output_sample(uint8_t s)
 {
-  OCR2 = s;
+  OCR1 = s;
 }
 
 #ifdef DEBUG_MODEM
 inline uint16_t afsk_timer_counter()
 {
-  uint16_t t = TCNT2;
-  if ((TIFR2 & _BV(TOV2)) && t < 128)
+  uint16_t t = TCNT1;
+  if ((TIFR1 & _BV(TOV1)) && t < 128)
     t += 256;
   return t;
 }
 
 inline int afsk_isr_overrun()
 {
-  return (TIFR2 & _BV(TOV2));
+  return (TIFR1 & _BV(TOV1));
 }
 #endif
 
