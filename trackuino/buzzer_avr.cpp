@@ -28,6 +28,24 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
+#if BUZZER_TYPE == 0 // Active mode, DC output
+
+void buzzer_setup()
+{
+  pinMode(BUZZER_PIN, OUTPUT);
+}
+
+void buzzer_on()
+{
+  digitalWrite(BUZZER_PIN, true);
+}
+
+void buzzer_off()
+{
+  digitalWrite(BUZZER_PIN, false);
+}
+
+#elif BUZZER_TYPE == 1 // Passive mode, PWM output
 
 // Module constants
 static const unsigned long PWM_PERIOD = F_CPU / BUZZER_FREQ;
@@ -112,4 +130,5 @@ ISR (TIMER1_OVF_vect)
   }
 }
 
+#endif // #if BUZZER_TYPE==1 (passive)
 #endif // #ifdef AVR

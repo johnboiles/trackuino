@@ -14,42 +14,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-#if defined(AVR) && !defined(__AVR_ATmega32U4__)
+#if defined(__AVR_ATmega32U4__)
 
 #include <avr/power.h>
-#include <avr/interrupt.h>
+#include <avr/signal.h>
 #include <avr/sleep.h>
-#if (ARDUINO + 1) >= 100
-#  include <Arduino.h>
-#else
-#  include <WProgram.h>
-#endif
+#include <Arduino.h>
 #include "config.h"
 #include "pin.h"
 #include "power.h"
 
 void disable_bod_and_sleep()
 {
-  /* This will turn off brown-out detection while
-   * sleeping. Unfortunately this won't work in IDLE mode.
-   * Relevant info about BOD disabling: datasheet p.44
-   *
-   * Procedure to disable the BOD:
-   *
-   * 1. BODSE and BODS must be set to 1
-   * 2. Turn BODSE to 0
-   * 3. BODS will automatically turn 0 after 4 cycles
-   *
-   * The catch is that we *must* go to sleep between 2
-   * and 3, ie. just before BODS turns 0.
+  /* Atmega32U4 Processors don't have the ability to disable BOD while sleeping.
+   * The only BOD configuration is done in the BODLEVEL fuses (p.52)
    */
-  unsigned char mcucr;
-
-  cli();
-  mcucr = MCUCR | (_BV(BODS) | _BV(BODSE));
-  MCUCR = mcucr;
-  MCUCR = mcucr & (~_BV(BODSE));
-  sei();
   sleep_mode();    // Go to sleep
 }
 
