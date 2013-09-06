@@ -77,9 +77,11 @@ void aprs_send()
   ax25_send_string(temp);
 #endif
 #endif
+#ifndef INTERNAL_LM60_DISABLED
   ax25_send_string("/Ti=");
   snprintf(temp, 6, "%d", sensors_int_lm60());
   ax25_send_string(temp);
+#endif
 #ifndef EXTERNAL_LM60_DISABLED
   ax25_send_string("/Te=");
   snprintf(temp, 6, "%d", sensors_ext_lm60());

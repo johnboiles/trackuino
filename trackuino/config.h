@@ -143,6 +143,7 @@
 // Read more in the Arduino reference docs:
 // http://arduino.cc/en/Reference/AnalogReference?from=Reference.AREF
 
+#define INTERNAL_LM60_DISABLED
 #define EXTERNAL_LM60_DISABLED
 
 // Pin mappings for the internal / external temperature sensors. VS refers
