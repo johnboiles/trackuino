@@ -87,13 +87,15 @@ void setup()
   sensors_setup();
 
 #ifdef DEBUG_SENS
-  Serial.print("Ti=");
+#ifndef INTERNAL_LM60_DISABLED
+  Serial.print("Ti=, ");
   Serial.print(sensors_int_lm60());
+#endif
 #ifndef EXTERNAL_LM60_DISABLED
-  Serial.print(", Te=");
+  Serial.print("Te=, ");
   Serial.print(sensors_ext_lm60());
 #endif
-  Serial.print(", Vin=");
+  Serial.print("Vin=");
   Serial.println(sensors_vin());
 #endif
 
@@ -158,13 +160,15 @@ void loop()
 #endif
 #ifdef LCD_ENABLED
     lcd.setCursor(0, 1);
-    lcd.print("Ti=");
+#ifndef INTERNAL_LM60_DIABLED
+    lcd.print("Ti=, ");
     lcd.print(sensors_int_lm60());
+#endif
 #ifndef EXTERNAL_LM60_DISABLED
-    lcd.print(", Te=");
+    lcd.print("Te=, ");
     lcd.print(sensors_ext_lm60());
 #endif
-    lcd.print(", Vin=");
+    lcd.print("Vin=");
     lcd.print(sensors_vin());
 #endif
     aprs_send();
