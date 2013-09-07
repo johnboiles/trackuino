@@ -24,7 +24,18 @@
 #include <avr/pgmspace.h>
 #include "config.h"
 
-#define AFSK_ISR ISR(TIMER1_OVF_vect)
+// By default, we use TIMER4 on 32u4 processors, but we still have support for TIMER1
+// Note(johnb): As long as timer4 works fine, we could drop the timer1 code since
+// timer4 has the ability to use the same two pins as timer1.
+
+//#define AVR32U4_USE_TIMER1 1
+
+#if AVR32U4_USE_TIMER1
+#  define AFSK_ISR ISR(TIMER1_OVF_vect)
+#else
+#  define AFSK_ISR ISR(TIMER4_OVF_vect)
+#endif
+
 
 // Exported consts
 extern const uint32_t MODEM_CLOCK_RATE;
@@ -35,14 +46,27 @@ extern const uint32_t PLAYBACK_RATE;
 // Exported vars
 extern const prog_uchar afsk_sine_table[];
 
-// Inline functions (this saves precious cycles in the ISR)
-#if AUDIO_PIN == 9
-#  define OCR1 OCR1A
-#endif
-#if AUDIO_PIN == 10
-#  define OCR1 OCR1B
+#if AVR32U4_USE_TIMER1
+#  if AUDIO_PIN == 9
+#    define AFSK_OCR OCR1A
+#  elif AUDIO_PIN == 10
+#    define AFSK_OCR OCR1B
+#  else
+#    error "Only AUDIO_PIN 9 and 10 are supported for 32u4 processors with timer 1."
+#  endif
+#else
+#  if AUDIO_PIN == 6
+#    define AFSK_OCR OCR4D
+#  elif AUDIO_PIN == 10
+#    define AFSK_OCR OCR4B
+#  elif AUDIO_PIN == 13
+#    define AFSK_OCR OCR4A
+#  else
+#    error "Only AUDIO_PIN 9 and 10 are supported for 32u4 processors with timer 4."
+#  endif
 #endif
 
+// Inline functions (this saves precious cycles in the ISR)
 inline uint8_t afsk_read_sample(int phase)
 {
   return pgm_read_byte_near(afsk_sine_table + phase);
@@ -50,7 +74,7 @@ inline uint8_t afsk_read_sample(int phase)
 
 inline void afsk_output_sample(uint8_t s)
 {
-  OCR1 = s;
+  AFSK_OCR = s;
 }
 
 inline void afsk_clear_interrupt_flag()

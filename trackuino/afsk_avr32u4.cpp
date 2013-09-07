@@ -78,7 +78,7 @@ extern const uint32_t PLAYBACK_RATE    = MODEM_CLOCK_RATE / 256;  // Fast PWM
 
 // Exported functions
 
-void afsk_timer_setup()
+void afsk_timer1_setup()
 {
   // Set up timer 1 (pins 9/OC1A or 10/OC1B) to do pulse width modulation on the speaker
   // pin. Don't use Timer 0 because changing its prescaler value would mess with millis() and delay()
@@ -108,28 +108,92 @@ void afsk_timer_setup()
   // COM2B1=1, COM2B0=0, COM2A1=0, COM2A0=0
   TCCR1A = (TCCR1A | _BV(COM1B1)) & ~(_BV(COM1B0) | _BV(COM1A1) | _BV(COM1A0));
 #endif
+}
+
+void afsk_timer4_setup()
+{
+  // Set up timer 4 (pins 10/OC4B, 6/OC4D, 13/OC4A) --see PWM4X for inverted pins)
+  // to do pulse width modulation on the speaker pin.
+  // It might also be possible to use 5/~OC4A, 9/~OC4B, 12/~OC4B, however it looks like
+  // you can only configure those pins to be used in addition to the non-inverted pins.
+  // (see COM4n)
+  // Don't use Timer 0 because changing its prescaler value would mess with millis() and delay()
+  // See the pin configuration of the ATMega32U4 here: http://arduino.cc/en/Hacking/PinMapping32u4
+
+  // Source timer4 from clkIO with no prescale CS4[3:0] = 1 (datasheet p.166)
+  TCCR4B = (TCCR4B | _BV(CS40)) & ~(_BV(CS43) | _BV(CS42) | _BV(CS41));
+  TCCR4B &= ~(_BV(DTPS41) | _BV(DTPS40));
+
+  // Set fast PWM mode with TOP = 0xff: WGM1[1:0] = 0  (p.129)
+  // This allows 256 cycles per sample and gives 16M/256 = 62.5 KHz PWM rate
+  // NOTE(johnb): From datasheet: Update of OCRnx at TOP, TOVn Flag Set on TOP
+  TCCR4D &= ~(_BV(WGM41) | _BV(WGM40));
+
+  #if AUDIO_PIN == 13 // OC4A
+    TCCR4A |= _BV(PWM4A);
+    // Cleared on Compare Match. Set when TCNT4 = 0x000.
+    TCCR4A = (TCCR4A | _BV(COM4A1)) & ~_BV(COM4A0);
+  #endif
+
+  #if AUDIO_PIN == 10 // OC4B
+    TCCR4A |= _BV(PWM4B);
+    // Cleared on Compare Match. Set when TCNT4 = 0x000.
+    TCCR4A = (TCCR4A | _BV(COM4B1)) & ~_BV(COM4B0);
+  #endif
+
+  #if AUDIO_PIN == 6 // OC4D
+    TCCR4C |= _BV(PWM4D);
+    // Cleared on Compare Match. Set when TCNT4 = 0x000.
+    TCCR4C = (TCCR4C | _BV(COM4D1)) & ~_BV(COM4D0);
+  #endif
+
+  // Set the TOP value for Timer4 OC
+  OCR4C = 255;
+}
+
+void afsk_timer_setup()
+{
+#if AVR32U4_USE_TIMER1
+  afsk_timer1_setup();
+#else
+  afsk_timer4_setup();
+#endif
 
   // Set initial pulse width to the rest position (0v after DC decoupling)
-  OCR1 = REST_DUTY;
+  AFSK_OCR = REST_DUTY;
 }
 
 void afsk_timer_start()
 {
+#if AVR32U4_USE_TIMER1
   // Clear the overflow flag, so that the interrupt doesn't go off
   // immediately and overrun the next one (p.163).
   TIFR1 |= _BV(TOV1);       // Yeah, writing a 1 clears the flag.
 
   // Enable interrupt when TCNT2 reaches TOP (0xFF) (p.151, 163)
   TIMSK1 |= _BV(TOIE1);
+#else
+  // Clear the overflow flag, so that the interrupt doesn't go off
+  // immediately and overrun the next one.
+  TIFR4 |= _BV(TOV4);       // Yeah, writing a 1 clears the flag.
+
+  // Enable interrupt when TCNT2 reaches TOP (0xFF) (p.151, 163)
+  TIMSK4 |= _BV(TOIE4);
+#endif
 }
 
 void afsk_timer_stop()
 {
   // Output 0v (after DC coupling)
-  OCR1 = REST_DUTY;
+  AFSK_OCR = REST_DUTY;
 
+#if AVR32U4_USE_TIMER1
   // Disable playback interrupt
   TIMSK1 &= ~_BV(TOIE1);
+#else
+  // Disable playback interrupt
+  TIMSK4 &= ~_BV(TOIE4);
+#endif
 }
 
 
