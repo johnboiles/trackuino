@@ -21,10 +21,24 @@
 
 // This is the timer 2 interrupt service routine (ISR). Multiple
 // modems can be operated from here.
+#if AFSK_USE_TIMER1
+
 ISR(TIMER1_OVF_vect)
 {
   // Call modem ISRs:
   afsk_isr();
 }
+
+#endif
+
+#if AFSK_USE_TIMER4
+
+ISR(TIMER4_OVF_vect)
+{
+  // Call modem ISRs:
+  afsk_isr();
+}
+
+#endif
 
 #endif

@@ -33,14 +33,15 @@ extern const uint32_t PLAYBACK_RATE;
 // Exported vars
 extern const prog_uchar afsk_sine_table[];
 
-// Inline functions (this saves precious cycles in the ISR)
 #if AUDIO_PIN == 3
 #  define OCR2 OCR2B
-#endif
-#if AUDIO_PIN == 11
+#elif AUDIO_PIN == 11
 #  define OCR2 OCR2A
+#else
+#  error "Only AUDIO_PIN 3 and 11 are supported for AVR processors."
 #endif
 
+// Inline functions (this saves precious cycles in the ISR)
 inline uint8_t afsk_read_sample(int phase)
 {
   return pgm_read_byte_near(afsk_sine_table + phase);

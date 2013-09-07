@@ -41,18 +41,14 @@ void buzzer_off()
   digitalWrite(BUZZER_PIN, false);
 }
 
+// NOTE(johnb): Passive mode might not work with 32u4.
 #elif BUZZER_TYPE == 1 // Passive mode, PWM output
 
 // Module constants
 static const unsigned long PWM_PERIOD = F_CPU / BUZZER_FREQ;
 static const unsigned long ON_CYCLES = BUZZER_FREQ * BUZZER_ON_TIME;
 static const unsigned long OFF_CYCLES = BUZZER_FREQ * BUZZER_OFF_TIME;
-#if BUZZER_TYPE == 0  // active buzzer
-static const uint16_t DUTY_CYCLE = PWM_PERIOD;
-#endif
-#if BUZZER_TYPE == 1  // passive buzzer
 static const uint16_t DUTY_CYCLE = PWM_PERIOD / 2;
-#endif
 
 // Module variables
 static volatile bool is_buzzer_on;
@@ -125,5 +121,5 @@ ISR (TIMER1_OVF_vect)
   }
 }
 
-#endif // #if BUZZER_TYPE==1 (passive)
+#endif // #if BUZZER_TYPE
 #endif // #ifdef AVR
