@@ -32,6 +32,12 @@
 #  include <WProgram.h>
 #endif
 
+#if defined(__AVR_ATmega32U4__)
+#define INTERNAL_REFERENCE_VOLTAGE 2560L
+#else
+#define INTERNAL_REFERENCE_VOLTAGE 1100L
+#endif
+
 /*
  * sensors_aref: measure an external voltage hooked up to the AREF pin,
  * optionally (and recommendably) through a pull-up resistor. This is
@@ -71,21 +77,6 @@ void sensors_setup()
   pinMode(EXTERNAL_LM60_VS_PIN, OUTPUT);
 }
 
-long sensors_internal_temp()
-{
-  long result;
-  // Read temperature sensor against 1.1V reference
-  ADMUX = _BV(REFS1) | _BV(REFS0) | _BV(MUX3);
-  delay(2); // Wait for Vref to settle
-  ADCSRA |= _BV(ADSC); // Convert
-  while (bit_is_set(ADCSRA,ADSC));
-  result = (ADCH << 8) | ADCL;
-  
-  result = (result - 125) * 1075;
-
-  return result;
-}
-
 int sensors_lm60(int powerPin, int readPin)
 {
   pin_write(powerPin, HIGH);      // Turn the LM60 on
@@ -95,7 +86,7 @@ int sensors_lm60(int powerPin, int readPin)
   int adc = analogRead(readPin);  // Real read
   pin_write(powerPin, LOW);       // Turn the LM60 off
 
-  int mV = 1100L * adc / 1024L;   // Millivolts
+  int mV = INTERNAL_REFERENCE_VOLTAGE * adc / 1024L;   // Millivolts
 
   switch(TEMP_UNIT) {
     case 1: // C
