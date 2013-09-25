@@ -21,7 +21,6 @@
 
 void sensors_setup();
 unsigned long sensors_aref();
-long sensors_internal_temp();
 int sensors_int_lm60();
 int sensors_ext_lm60();
 int sensors_vin();
