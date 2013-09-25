@@ -67,15 +67,23 @@ static int32_t next_aprs = 0;
 LiquidCrystal lcd(LCD_PINS);
 #endif
 
+#define DEBUG_SERIAL Serial
 
 void setup()
 {
   pinMode(LED_PIN, OUTPUT);
   pin_write(LED_PIN, LOW);
 
-  Serial.begin(GPS_BAUDRATE);
+  GPS_SERIAL.begin(GPS_BAUDRATE);
+
+#if defined(__AVR_ATmega32U4__) && (defined(DEBUG_GPS) || defined(DEBUG_RESET) || defined(DEBUG_MODEM) || defined(DEBUG_SENS) || defined(DEBUG_AX25))
+  DEBUG_SERIAL.begin(115200);
+  // Wait for serial port to connect. Needed for Atmega 32u4 processors only
+  while (!DEBUG_SERIAL) {}
+#endif
+
 #ifdef DEBUG_RESET
-  Serial.println("RESET");
+  DEBUG_SERIAL.println("RESET");
 #endif
 
 #ifndef GPS_DISABLED
@@ -89,15 +97,17 @@ void setup()
 
 #ifdef DEBUG_SENS
 #ifndef INTERNAL_LM60_DISABLED
-  Serial.print("Ti=, ");
-  Serial.print(sensors_int_lm60());
+  DEBUG_SERIAL.print("Ti=");
+  DEBUG_SERIAL.print(sensors_int_lm60());
+  DEBUG_SERIAL.print(", ");
 #endif
 #ifndef EXTERNAL_LM60_DISABLED
-  Serial.print("Te=, ");
-  Serial.print(sensors_ext_lm60());
+  DEBUG_SERIAL.print("Te=");
+  DEBUG_SERIAL.print(sensors_ext_lm60());
+  DEBUG_SERIAL.print(", ");
 #endif
-  Serial.print("Vin=");
-  Serial.println(sensors_vin());
+  DEBUG_SERIAL.print("Vin=");
+  DEBUG_SERIAL.println(sensors_vin());
 #endif
 
 #ifndef GPS_DISABLED
@@ -105,9 +115,9 @@ void setup()
   // for slotted transmissions.
   if (APRS_SLOT >= 0) {
     do {
-      while (! Serial.available())
+      while (! GPS_SERIAL.available())
         power_save();
-    } while (! gps_decode(Serial.read()));
+    } while (! gps_decode(GPS_SERIAL.read()));
     
     next_aprs = millis() + 1000 *
       (APRS_PERIOD - (gps_seconds + APRS_PERIOD - APRS_SLOT) % APRS_PERIOD);
@@ -137,8 +147,8 @@ void get_pos()
   int valid_pos = 0;
   uint32_t timeout = millis();
   do {
-    if (Serial.available())
-      valid_pos = gps_decode(Serial.read());
+    if (GPS_SERIAL.available())
+      valid_pos = gps_decode(GPS_SERIAL.read());
   } while ( (millis() - timeout < VALID_POS_TIMEOUT) && ! valid_pos) ;
 
 #ifndef GPS_DISABLED
