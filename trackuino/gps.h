@@ -20,6 +20,12 @@
 
 #include <stdint.h>
 
+#if defined(__AVR_ATmega32U4__)
+#define GPS_SERIAL Serial1
+#else
+#define GPS_SERIAL Serial
+#endif
+
 extern char gps_time[7];       // HHMMSS
 extern uint32_t gps_seconds;   // seconds after midnight
 extern char gps_date[7];       // DDMMYY
