@@ -17,6 +17,14 @@
 #ifndef __POWER_H__
 #define __POWER_H__
 
+#ifdef DEBUG_PIN_INVERT
+#define DEBUG_PIN_ON LOW
+#define DEBUG_PIN_OFF HIGH
+#else
+#define DEBUG_PIN_ON HIGH
+#define DEBUG_PIN_OFF LOW
+#endif
+
 void power_save();
 
 #endif // ifndef __POWER_H__
