@@ -64,9 +64,9 @@ void power_save()
   power_spi_disable();
   power_twi_disable();
 
-  pin_write(LED_PIN, LOW);
+  pin_write(LED_PIN, DEBUG_PIN_ON);
   sleep_mode();    // Go to sleep
-  pin_write(LED_PIN, HIGH);
+  pin_write(LED_PIN, DEBUG_PIN_OFF);
   
   sleep_disable();  // Resume after wake up
   power_all_enable();

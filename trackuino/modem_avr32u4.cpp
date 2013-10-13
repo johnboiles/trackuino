@@ -19,7 +19,7 @@
 #include "afsk_avr32u4.h"
 #include <avr/interrupt.h>
 
-// This is the timer 2 interrupt service routine (ISR). Multiple
+// This is the timer 1 interrupt service routine (ISR). Multiple
 // modems can be operated from here.
 #if AFSK_USE_TIMER1
 
