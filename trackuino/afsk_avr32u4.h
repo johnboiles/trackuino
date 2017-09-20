@@ -44,7 +44,7 @@ extern const uint16_t TABLE_SIZE;
 extern const uint32_t PLAYBACK_RATE;
 
 // Exported vars
-extern const prog_uchar afsk_sine_table[];
+extern const unsigned char afsk_sine_table[];
 
 #if AVR32U4_USE_TIMER1
 #  if AUDIO_PIN == 9
