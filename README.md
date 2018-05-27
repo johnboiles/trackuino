@@ -6,7 +6,7 @@ Board support
 -------------
 Arduinos based on ATmega328 (e.g. Uno), ATmega32u4 (e.g. Arduino Leonardo), and chipKIT Uno32 are supported. Here are a couple PCB designs that work with this firmware:
 
-* [Official Trackuino Shield](https://code.google.com/p/trackuino/wiki/TrackuinoShield22)
+* [Official Trackuino Shield](https://github.com/trackuino/trackuino)
 * [TinyTrackuino](https://github.com/johnboiles/tinytrackuino)
 
 Building with the Arduino IDE
